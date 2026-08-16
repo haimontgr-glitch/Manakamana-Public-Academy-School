@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - Manakamana Public Academy</title>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getAuth, createUserWithEmailAndPassword,
+    signInWithEmailAndPassword, sendEmailVerification
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDokbUJuiMGh2v2agyvlyKfHiM1DCQ5wOE",
+    authDomain: "manakamana-website.firebaseapp.com",
+    projectId: "manakamana-website",
+    storageBucket: "manakamana-website.firebasestorage.app",
+    messagingSenderId: "808390020313",
+    appId: "1:808390020313:web:94c9fb355da292825a82c8"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  window.registerUser = function () {
+    const email = document.getElementById('regEmail').value;
+    const pass = document.getElementById('regPass').value;
+    const msg = document.getElementById('regMsg');
+
+    createUserWithEmailAndPassword(auth, email, pass)
+      .then((userCredential) => {
+        sendEmailVerification(userCredential.user);
+        msg.textContent = "✅ Account created! Check your email to verify.";
+        msg.style.color = "lightgreen";
+      })
+      .catch((error) => {
+        msg.textContent = "❌ " + error.message;
+        msg.style.color = "salmon";
+      });
+  };
+
+  window.loginUser = function () {
+    const email = document.getElementById('loginEmail').value;
+    const pass = document.getElementById('loginPass').value;
+    const msg = document.getElementById('loginMsg');
+
+    signInWithEmailAndPassword(auth, email, pass)
+      .then((userCredential) => {
+        if (!userCredential.user.emailVerified) {
+          msg.textContent = "⚠️ Please verify your email before logging in.";
+          msg.style.color = "orange";
+          return;
+        }
+        msg.textContent = "✅ Login successful! Redirecting...";
+        msg.style.color = "lightgreen";
+        setTimeout(() => window.location.href = "dashboard.html", 1500);
+      })
+      .catch((error) => {
+        msg.textContent = "❌ " + error.message;
+        msg.style.color = "salmon";
+      });
+  };
+</script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #1e3a8a, #2563eb);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 15px;
+  }
+
+  .logo-box { text-align: center; margin-bottom: 20px; }
+  .logo-box img {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    box-shadow: 0 0 25px rgba(255,215,0,0.6);
+    animation: pop 0.6s ease;
+  }
+  .logo-box h1 { color: white; font-size: 20px; margin-top: 12px; }
+  .logo-box p { color: #cfe0ff; font-size: 13px; }
+
+  @keyframes pop {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .box {
+    background: white;
+    border-radius: 18px;
+    padding: 30px 25px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    animation: fadeUp 0.7s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .tabs { display: flex; margin-bottom: 20px; }
+  .tabs button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: #eee;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+    color: #555;
+  }
+  .tabs button.active { background: #1e3a8a; color: white; }
+  .tabs button:first-child { border-radius: 10px 0 0 10px; }
+  .tabs button:last-child { border-radius: 0 10px 10px 0; }
+
+  .form { display: none; flex-direction: column; gap: 12px; }
+  .form.active { display: flex; }
+
+  input {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+  }
+  input:focus { outline: 2px solid #1e3a8a; }
+
+  .form button.submit {
+    background: #1e3a8a;
+    color: white;
+    border: none;
+    padding: 13px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 5px;
+  }
+  .form button.submit:active { transform: scale(0.97); }
+
+  .msg { text-align: center; font-size: 14px; margin-top: 8px; min-height: 18px; }
+
+  .back { text-align: center; margin-top: 18px; }
+  .back a { color: #cfe0ff; font-size: 13px; text-decoration: none; }
+</style>
+</head>
+<body>
+
+  <div class="logo-box">
+    <img src="logo.png" alt="Manakamana Public Academy Logo">
+    <h1>Manakamana Public Academy</h1>
+    <p>Kohalpur-2, Banke | Estd. 2071</p>
+  </div>
+
+  <div class="box">
+    <div class="tabs">
+      <button id="tabLogin" class="active" onclick="showTab('login')">Login</button>
+      <button id="tabRegister" onclick="showTab('register')">Register</button>
+    </div>
+
+    <div id="loginForm" class="form active">
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPass" placeholder="Password">
+      <button class="submit" onclick="loginUser()">Login</button>
+      <div class="msg" id="loginMsg"></div>
+    </div>
+
+    <div id="registerForm" class="form">
+      <input type="email" id="regEmail" placeholder="Email">
+      <input type="password" id="regPass" placeholder="Password (min 6 characters)">
+      <button class="submit" onclick="registerUser()">Register</button>
+      <div class="msg" id="regMsg"></div>
+    </div>
+  </div>
+
+  <div class="back"><a href="index.html">← Back to Home</a></div>
+
+  <script>
+    function showTab(tab) {
+      document.getElementById('loginForm').classList.toggle('active', tab === 'login');
+      document.getElementById('registerForm').classList.toggle('active', tab === 'register');
+      document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+      document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+    }
+  </script>
+
+</body>
+</html>
